@@ -1,5 +1,5 @@
 void handleRoot() {
-  server.send(200, "text/plain", "1");
+  server.send(200, "text/plain", "1. MAC = " + WiFi.BSSIDstr() + " PRESSED: " + countPressed + " RSSI: " + WiFi.RSSI() + " dBm");
 }
 int testDoorBell() {
   server.send(200, "text/plain", sendingOneTime());
@@ -29,7 +29,7 @@ String getURL(String urls) {
   HTTPClient http;
   http.begin(urls); //HTTP
   int httpCode = http.GET();
-  if (httpCode == HTTP_CODE_OK) {
+  if (httpCode == 200) {
     answer = http.getString();
   }
   http.end();

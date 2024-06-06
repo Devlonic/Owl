@@ -1,6 +1,32 @@
 void debug() {
   Serial.println(n=n+1);
 }
+void displayAvailableAPs() {
+  int n = WiFi.scanNetworks();
+  Serial.println("scan done");
+  if (n == 0)
+    Serial.println("no networks found");
+  else
+  {
+    Serial.print(n);
+    Serial.println(" networks found");
+    for (int i = 0; i < n; ++i)
+    {
+      // Print SSID and RSSI for each network found
+      Serial.print(i + 1);
+      Serial.print(": ");
+      Serial.print(WiFi.SSID(i));
+      Serial.print(" (");
+      Serial.print(WiFi.RSSI(i));
+      Serial.print(")");
+      Serial.print(" ");
+      Serial.print(WiFi.BSSIDstr(i));
+      Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE)?" ":"*");
+      delay(10);
+    }
+  }
+  Serial.println("");
+}
 String sendingOneTime() {
     bool sended = false;
     HTTPClient http;
@@ -12,7 +38,7 @@ String sendingOneTime() {
     if (httpCode > 0) {
      Serial.printf("[HTTP] GET... code: %d\n", httpCode);
      
-     if (httpCode == HTTP_CODE_OK) {
+     if (httpCode == 200) {
         sended = true;
         payload = http.getString();
         Serial.println(payload);
@@ -25,6 +51,7 @@ String sendingOneTime() {
     return payload;
 }
 void sending() {
+  countPressed++;
   int times = 4;
   bool sended = false;
   while(times-- && !sended) {
@@ -35,7 +62,7 @@ void sending() {
     int httpCode = http.GET();
     if (httpCode > 0) {
      Serial.printf("[HTTP] GET... code: %d\n", httpCode);
-     if (httpCode == HTTP_CODE_OK) {
+     if (httpCode == 200) {
         sended = true;
         String payload = http.getString();
         Serial.println(payload);
@@ -58,9 +85,13 @@ int obstacle() {
   return value;
 }
 bool wificonnect(char* ssidcur, char* passcur) {
-  WiFi.begin(ssidcur, passcur);
+  displayAvailableAPs();
+  WiFi.begin(ssidcur, passcur, 0, mac);
+  //WiFi.begin(ssidcur, passcur);
   Serial.print("Connecting to ");
-  Serial.println(ssidcur);
+  Serial.print(ssidcur);
+  Serial.print(" ");
+  Serial.println("{0xC0, 0xA5, 0xDD, 0x08, 0x62, 0xA4}");
   int ttemp = 10;
   while (--ttemp > 0 && WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
@@ -68,11 +99,39 @@ bool wificonnect(char* ssidcur, char* passcur) {
   }
   if(WiFi.status() == WL_CONNECTED) {
     Serial.print("Connected to ");  
-    Serial.println(ssidcur);
+    Serial.print(ssidcur);
+    Serial.print(" ");
+    Serial.println(WiFi.BSSIDstr());
+    Serial.print(" ");
+    Serial.println(WiFi.localIP());
+    Serial.print(" ");
+    Serial.println(WiFi.macAddress());
     return 1;
   } else {
     Serial.print("No connection to ");
     Serial.println(ssidcur);
     return 0;
   }
+}
+
+void showWiFiStatus() {
+    Serial.println("");
+    Serial.print(WiFi.SSID());
+    Serial.print(" (");
+    Serial.print(WiFi.RSSI());
+    Serial.print(") ");
+    Serial.print(WiFi.BSSIDstr());
+    Serial.println("");
+}
+
+
+
+template<typename T>
+void myLog(T msg) {
+  Serial.print(msg);
+}
+
+template<typename T>
+void myLogLN(T msg) {
+  Serial.println(msg);
 }
