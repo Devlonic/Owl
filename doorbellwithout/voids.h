@@ -91,7 +91,7 @@ bool wificonnect(char* ssidcur, char* passcur) {
   Serial.print("Connecting to ");
   Serial.print(ssidcur);
   Serial.print(" ");
-  Serial.println("{0xC0, 0xA5, 0xDD, 0x08, 0x62, 0xA4}");
+  Serial.println("78-8c-b5-66-3d-e9");
   int ttemp = 10;
   while (--ttemp > 0 && WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
